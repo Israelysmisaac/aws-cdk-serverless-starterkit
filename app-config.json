@@ -1,0 +1,44 @@
+{
+    "appName": "CDK lambda",
+    "version": "1.0.0",
+    "region": "ap-south-1",
+    "stage": "local",
+    "provider": "aws",
+    "envFile": {
+        "local": "./environment/.local.env",
+        "dev": "./environment/.dev.env",
+        "production": "./environment/.production.env"
+    },
+    "apiGateway": [
+        {
+            "name": "my-serverless-app",
+            "type": "http",
+            "authenticationType": "custom",
+            "cors": "${env.cors}"
+        }
+    ],
+    "functions": [
+        {
+            "name": "course-${self.stage}",
+            "runtime": "lambda.Runtime.NODEJS_22_X",
+            "handler": "index.handler",
+            "srcFile": "src/lambda-handler/course.ts",
+            "output": "dist/course-handler/index.js",
+            "triggers": [
+                {
+                    "type": "http",
+                    "endpoint": "course",
+                    "method": "GET",
+                    "responseType": "application/json",
+                    "apiGatewayName": "my-serverless-app"
+                }
+            ],
+            "environmentVariable": {
+                "MONGODB_URI": "localhost:db",
+                "frontendUrl": "${env.frontendUrl}",
+                "functionName": "${currentFunction.name}",
+                "cors": "${env.cors}"
+            }
+        }
+    ]
+}

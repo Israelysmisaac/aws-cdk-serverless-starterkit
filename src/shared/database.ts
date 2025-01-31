@@ -1,6 +1,6 @@
 import { Db, MongoClient } from 'mongodb'
 
-const MONGODB_URI = "mongodb+srv://host/database?retryWrites=true&w=majority";
+const MONGODB_URI = "mongodb+srv://israelysmisaac:fjGdgFylQx0dAIb9@cluster0.3uuvs.mongodb.net/test-demo?retryWrites=true&w=majority";
 // Once we connect to the database once, we'll store that connection and reuse it so that we don't have to connect to the database on every request.
 export let cachedDb:Db|null = null;
 
