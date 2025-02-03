@@ -5,6 +5,8 @@ import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { interpolateConfig } from '../../config';
+import * as cognito from 'aws-cdk-lib/aws-cognito';
+// import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 interface AppConfig {
   appName: string;
@@ -13,6 +15,14 @@ interface AppConfig {
   stage: string;
   provider: string;
   envFile: Record<string, string>;
+  authorizer: Array<{
+    name: string;
+    type: string;
+    authFunctionName?: string;
+    userPool?: string;
+    tokenSource?: string;
+  }>;
+  vpc: Array<{ name: string }>;
   apiGateway: Array<{
     name: string;
     type: string;
@@ -25,6 +35,10 @@ interface AppConfig {
     handler: string;
     srcFile: string;
     output: string;
+    authorizer?: string;
+    memory?: number;
+    concurrency?: number;
+    timeout?: number;
     triggers: Array<{
       type: string;
       endpoint: string;
@@ -40,9 +54,19 @@ type Config = {
   [key: string]: string;
 };
 
+type AuthorizerInfo = {
+  authorizer: apigateway.IAuthorizer;
+  authType: apigateway.AuthorizationType;
+};
+
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, config: AppConfig, props?: cdk.StackProps) {
     super(scope, id, props);
+
+    // Look up the VPC
+    // const vpc = ec2.Vpc.fromLookup(this, 'VPC', {
+    //   vpcName: config.vpc[0].name,
+    // });
 
     // Create Lambda functions
     const functionMap: Record<string, lambda.Function> = {};
@@ -59,9 +83,42 @@ export class CdkStack extends cdk.Stack {
         code: lambda.Code.fromAsset(path.resolve(__dirname, fnConfig.output).replace("/src/infra/cdk", "").replace("index.js", "") ),
         handler: fnConfig.handler,
         environment: environmentVariables,
+        // vpc: vpc,
+        // vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
       });
 
       functionMap[fnConfig.name] = lambdaFunction;
+    });
+
+    // Create authorizers
+    const authorizers: Record<string, AuthorizerInfo> = {};
+    config.authorizer.forEach(authConfig => {
+      const authName = authConfig.name;
+      if (authConfig.type === 'restApi') {
+        if (authName === 'custom-auth' && authConfig.authFunctionName) {
+          const authFunctionName = interpolateConfig(config, authConfig.authFunctionName);
+          const authLambda = lambda.Function.fromFunctionName(this, `AuthLambda-${authName}`, authFunctionName);
+          const authorizer = new apigateway.TokenAuthorizer(this, `TokenAuthorizer-${authName}`, {
+            handler: authLambda,
+            identitySource: 'method.request.header.Authorization',
+          });
+          authorizers[authName] = {
+            authorizer: authorizer,
+            authType: apigateway.AuthorizationType.CUSTOM,
+          };
+        } else if (authName === 'cognito' && authConfig.userPool && authConfig.tokenSource) {
+          const userPoolId = interpolateConfig(config, authConfig.userPool);
+          const userPool = cognito.UserPool.fromUserPoolId(this, `UserPool-${authName}`, userPoolId);
+          const cognitoAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(this, `CognitoAuthorizer-${authName}`, {
+            cognitoUserPools: [userPool],
+            identitySource: authConfig.tokenSource,
+          });
+          authorizers[authName] = {
+            authorizer: cognitoAuthorizer,
+            authType: apigateway.AuthorizationType.COGNITO,
+          };
+        }
+      }
     });
 
     // Create API Gateway and integrate with Lambda functions
@@ -89,7 +146,19 @@ export class CdkStack extends cdk.Stack {
             });
             
             const resource = api.root.addResource(trigger.endpoint);
-            resource.addMethod(trigger.method, lambdaIntegration);
+
+            let methodOptions: any = {};
+            if (fnConfig.authorizer) {
+              const authorizerInfo = authorizers[fnConfig.authorizer];
+              if (authorizerInfo) {
+                methodOptions.authorizer = authorizerInfo.authorizer;
+                methodOptions.authorizationType = authorizerInfo.authType;
+              }
+            } else {
+              methodOptions.authorizationType = apigateway.AuthorizationType.NONE;
+            }
+
+            resource.addMethod(trigger.method, lambdaIntegration, methodOptions);
           });
       });
     });
