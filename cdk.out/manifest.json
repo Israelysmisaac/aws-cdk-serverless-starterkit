@@ -1,138 +1,108 @@
 {
   "version": "39.0.0",
   "artifacts": {
-    "test-cdk-serverless.assets": {
+    "test-cdk-serverless-local.assets": {
       "type": "cdk:asset-manifest",
       "properties": {
-        "file": "test-cdk-serverless.assets.json",
+        "file": "test-cdk-serverless-local.assets.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
       }
     },
-    "test-cdk-serverless": {
+    "test-cdk-serverless-local": {
       "type": "aws:cloudformation:stack",
       "environment": "aws://unknown-account/unknown-region",
       "properties": {
-        "templateFile": "test-cdk-serverless.template.json",
+        "templateFile": "test-cdk-serverless-local.template.json",
         "terminationProtection": false,
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/d2b94d7de4b68ee818c3fba588e0d82ff726098bb5bc24abbd3b507ee9356e3a.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe6f34f32ed30f1309d82a9b108bab695eaf60c1f8dd5986231e4727db80b603.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
-          "test-cdk-serverless.assets"
+          "test-cdk-serverless-local.assets"
         ],
         "lookupRole": {
           "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
           "requiresBootstrapStackVersion": 8,
           "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
         },
-        "stackName": "chatbot-cdk-serverless"
+        "stackName": "chatbot-cdk-serverless-local"
       },
       "dependencies": [
-        "test-cdk-serverless.assets"
+        "test-cdk-serverless-local.assets"
       ],
       "metadata": {
-        "/test-cdk-serverless/course-${self.stage}/ServiceRole/Resource": [
+        "/test-cdk-serverless-local/course-local/ServiceRole/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "courseselfstageServiceRoleA4B344B0"
+            "data": "courselocalServiceRole47834F7A"
           }
         ],
-        "/test-cdk-serverless/course-${self.stage}/Resource": [
+        "/test-cdk-serverless-local/course-local/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "courseselfstage55546A7F"
+            "data": "courselocal47E348A5"
           }
         ],
-        "/test-cdk-serverless/my-serverless-app/Resource": [
+        "/test-cdk-serverless-local/my-serverless-app-local/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "myserverlessapp5B3C5FBB"
+            "data": "myserverlessapplocal75227048"
           }
         ],
-        "/test-cdk-serverless/my-serverless-app/Deployment/Resource": [
+        "/test-cdk-serverless-local/my-serverless-app-local/Deployment/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "myserverlessappDeploymentFB28FC6B003fb77b3f973db273f09b06185d98f5"
+            "data": "myserverlessapplocalDeploymentAF9F9E13a1efd9bc82a8d8143e72fb97510b0cc5"
           }
         ],
-        "/test-cdk-serverless/my-serverless-app/DeploymentStage.prod/Resource": [
+        "/test-cdk-serverless-local/my-serverless-app-local/DeploymentStage.local/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "myserverlessappDeploymentStageprodD57F7890"
+            "data": "myserverlessapplocalDeploymentStagelocalBD3EBF93"
           }
         ],
-        "/test-cdk-serverless/my-serverless-app/Endpoint": [
+        "/test-cdk-serverless-local/my-serverless-app-local/Endpoint": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "myserverlessappEndpointF7BE099D"
+            "data": "myserverlessapplocalEndpoint169F5502"
           }
         ],
-        "/test-cdk-serverless/my-serverless-app/Default/OPTIONS/Resource": [
+        "/test-cdk-serverless-local/my-serverless-app-local/Default/OPTIONS/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "myserverlessappOPTIONSB3336E67"
+            "data": "myserverlessapplocalOPTIONS1EDE5C6C"
           }
         ],
-        "/test-cdk-serverless/my-serverless-app/Default/course/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "myserverlessappcourseECD737D6"
-          }
-        ],
-        "/test-cdk-serverless/my-serverless-app/Default/course/OPTIONS/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "myserverlessappcourseOPTIONSB5173D9E"
-          }
-        ],
-        "/test-cdk-serverless/my-serverless-app/Default/course/GET/ApiPermission.testcdkserverlessmyserverlessapp2A5DE5B9.GET..course": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "myserverlessappcourseGETApiPermissiontestcdkserverlessmyserverlessapp2A5DE5B9GETcourseF1A72F0F"
-          }
-        ],
-        "/test-cdk-serverless/my-serverless-app/Default/course/GET/ApiPermission.Test.testcdkserverlessmyserverlessapp2A5DE5B9.GET..course": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "myserverlessappcourseGETApiPermissionTesttestcdkserverlessmyserverlessapp2A5DE5B9GETcourseD477D8FF"
-          }
-        ],
-        "/test-cdk-serverless/my-serverless-app/Default/course/GET/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "myserverlessappcourseGET9A509FC4"
-          }
-        ],
-        "/test-cdk-serverless/CDKMetadata/Default": [
+        "/test-cdk-serverless-local/CDKMetadata/Default": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CDKMetadata"
           }
         ],
-        "/test-cdk-serverless/CDKMetadata/Condition": [
+        "/test-cdk-serverless-local/CDKMetadata/Condition": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CDKMetadataAvailable"
           }
         ],
-        "/test-cdk-serverless/BootstrapVersion": [
+        "/test-cdk-serverless-local/BootstrapVersion": [
           {
             "type": "aws:cdk:logicalId",
             "data": "BootstrapVersion"
           }
         ],
-        "/test-cdk-serverless/CheckBootstrapVersion": [
+        "/test-cdk-serverless-local/CheckBootstrapVersion": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CheckBootstrapVersion"
           }
         ]
       },
-      "displayName": "test-cdk-serverless"
+      "displayName": "test-cdk-serverless-local"
     },
     "Tree": {
       "type": "cdk:tree",

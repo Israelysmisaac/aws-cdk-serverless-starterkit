@@ -5,13 +5,31 @@
     "stage": "local",
     "provider": "aws",
     "envFile": {
-        "local": "./environment/.local.env",
-        "dev": "./environment/.dev.env",
-        "production": "./environment/.production.env"
+        "local": "../environment/.local.env",
+        "dev": "../environment/.dev.env",
+        "production": "../environment/.production.env"
     },
+    "authorizer": [
+        {
+            "name": "custom-auth",
+            "type": "restApi",      // restApi or websocket
+            "authFunctionName": "auth-${self.stage}"
+        },
+        {
+            "name": "cognito",
+            "type": "restApi",
+            "userPool": "user-test",
+            "tokenSource": "Authorization"
+        }
+    ],
+    "vpc": [
+        {
+            "name": "vpc-1"
+        }
+    ],
     "apiGateway": [
         {
-            "name": "my-serverless-app",
+            "name": "my-serverless-app-${self.stage}",
             "type": "http",
             "authenticationType": "custom",
             "cors": "${env.cors}"
@@ -24,6 +42,10 @@
             "handler": "index.handler",
             "srcFile": "src/lambda-handler/course.ts",
             "output": "dist/course-handler/index.js",
+            "authorizer": "custom-auth",
+            "memory": 256,
+            "concurrency": 10,
+            "timeout": 30,
             "triggers": [
                 {
                     "type": "http",

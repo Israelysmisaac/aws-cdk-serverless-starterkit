@@ -4,21 +4,21 @@
     "id": "App",
     "path": "",
     "children": {
-      "test-cdk-serverless": {
-        "id": "test-cdk-serverless",
-        "path": "test-cdk-serverless",
+      "test-cdk-serverless-local": {
+        "id": "test-cdk-serverless-local",
+        "path": "test-cdk-serverless-local",
         "children": {
-          "course-${self.stage}": {
-            "id": "course-${self.stage}",
-            "path": "test-cdk-serverless/course-${self.stage}",
+          "course-local": {
+            "id": "course-local",
+            "path": "test-cdk-serverless-local/course-local",
             "children": {
               "ServiceRole": {
                 "id": "ServiceRole",
-                "path": "test-cdk-serverless/course-${self.stage}/ServiceRole",
+                "path": "test-cdk-serverless-local/course-local/ServiceRole",
                 "children": {
                   "ImportServiceRole": {
                     "id": "ImportServiceRole",
-                    "path": "test-cdk-serverless/course-${self.stage}/ServiceRole/ImportServiceRole",
+                    "path": "test-cdk-serverless-local/course-local/ServiceRole/ImportServiceRole",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.Resource",
                       "version": "2.177.0"
@@ -26,7 +26,7 @@
                   },
                   "Resource": {
                     "id": "Resource",
-                    "path": "test-cdk-serverless/course-${self.stage}/ServiceRole/Resource",
+                    "path": "test-cdk-serverless-local/course-local/ServiceRole/Resource",
                     "attributes": {
                       "aws:cdk:cloudformation:type": "AWS::IAM::Role",
                       "aws:cdk:cloudformation:props": {
@@ -71,11 +71,11 @@
               },
               "Code": {
                 "id": "Code",
-                "path": "test-cdk-serverless/course-${self.stage}/Code",
+                "path": "test-cdk-serverless-local/course-local/Code",
                 "children": {
                   "Stage": {
                     "id": "Stage",
-                    "path": "test-cdk-serverless/course-${self.stage}/Code/Stage",
+                    "path": "test-cdk-serverless-local/course-local/Code/Stage",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.AssetStaging",
                       "version": "2.177.0"
@@ -83,7 +83,7 @@
                   },
                   "AssetBucket": {
                     "id": "AssetBucket",
-                    "path": "test-cdk-serverless/course-${self.stage}/Code/AssetBucket",
+                    "path": "test-cdk-serverless-local/course-local/Code/AssetBucket",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_s3.BucketBase",
                       "version": "2.177.0"
@@ -97,7 +97,7 @@
               },
               "Resource": {
                 "id": "Resource",
-                "path": "test-cdk-serverless/course-${self.stage}/Resource",
+                "path": "test-cdk-serverless-local/course-local/Resource",
                 "attributes": {
                   "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
                   "aws:cdk:cloudformation:props": {
@@ -110,15 +110,15 @@
                     "environment": {
                       "variables": {
                         "MONGODB_URI": "localhost:db",
-                        "frontendUrl": "process.envfrontendUrl}",
-                        "functionName": "course-${self.stage}",
-                        "cors": "process.envcors}"
+                        "frontendUrl": "${env.frontendUrl}",
+                        "functionName": "course-local",
+                        "cors": "${env.cors}"
                       }
                     },
                     "handler": "index.handler",
                     "role": {
                       "Fn::GetAtt": [
-                        "courseselfstageServiceRoleA4B344B0",
+                        "courselocalServiceRole47834F7A",
                         "Arn"
                       ]
                     },
@@ -136,17 +136,17 @@
               "version": "2.177.0"
             }
           },
-          "my-serverless-app": {
-            "id": "my-serverless-app",
-            "path": "test-cdk-serverless/my-serverless-app",
+          "my-serverless-app-local": {
+            "id": "my-serverless-app-local",
+            "path": "test-cdk-serverless-local/my-serverless-app-local",
             "children": {
               "Resource": {
                 "id": "Resource",
-                "path": "test-cdk-serverless/my-serverless-app/Resource",
+                "path": "test-cdk-serverless-local/my-serverless-app-local/Resource",
                 "attributes": {
                   "aws:cdk:cloudformation:type": "AWS::ApiGateway::RestApi",
                   "aws:cdk:cloudformation:props": {
-                    "name": "my-serverless-app"
+                    "name": "my-serverless-app-local"
                   }
                 },
                 "constructInfo": {
@@ -156,17 +156,17 @@
               },
               "Deployment": {
                 "id": "Deployment",
-                "path": "test-cdk-serverless/my-serverless-app/Deployment",
+                "path": "test-cdk-serverless-local/my-serverless-app-local/Deployment",
                 "children": {
                   "Resource": {
                     "id": "Resource",
-                    "path": "test-cdk-serverless/my-serverless-app/Deployment/Resource",
+                    "path": "test-cdk-serverless-local/my-serverless-app-local/Deployment/Resource",
                     "attributes": {
                       "aws:cdk:cloudformation:type": "AWS::ApiGateway::Deployment",
                       "aws:cdk:cloudformation:props": {
                         "description": "Automatically created by the RestApi construct",
                         "restApiId": {
-                          "Ref": "myserverlessapp5B3C5FBB"
+                          "Ref": "myserverlessapplocal75227048"
                         }
                       }
                     },
@@ -181,23 +181,23 @@
                   "version": "2.177.0"
                 }
               },
-              "DeploymentStage.prod": {
-                "id": "DeploymentStage.prod",
-                "path": "test-cdk-serverless/my-serverless-app/DeploymentStage.prod",
+              "DeploymentStage.local": {
+                "id": "DeploymentStage.local",
+                "path": "test-cdk-serverless-local/my-serverless-app-local/DeploymentStage.local",
                 "children": {
                   "Resource": {
                     "id": "Resource",
-                    "path": "test-cdk-serverless/my-serverless-app/DeploymentStage.prod/Resource",
+                    "path": "test-cdk-serverless-local/my-serverless-app-local/DeploymentStage.local/Resource",
                     "attributes": {
                       "aws:cdk:cloudformation:type": "AWS::ApiGateway::Stage",
                       "aws:cdk:cloudformation:props": {
                         "deploymentId": {
-                          "Ref": "myserverlessappDeploymentFB28FC6B003fb77b3f973db273f09b06185d98f5"
+                          "Ref": "myserverlessapplocalDeploymentAF9F9E13a1efd9bc82a8d8143e72fb97510b0cc5"
                         },
                         "restApiId": {
-                          "Ref": "myserverlessapp5B3C5FBB"
+                          "Ref": "myserverlessapplocal75227048"
                         },
-                        "stageName": "prod"
+                        "stageName": "local"
                       }
                     },
                     "constructInfo": {
@@ -213,7 +213,7 @@
               },
               "Endpoint": {
                 "id": "Endpoint",
-                "path": "test-cdk-serverless/my-serverless-app/Endpoint",
+                "path": "test-cdk-serverless-local/my-serverless-app-local/Endpoint",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.CfnOutput",
                   "version": "2.177.0"
@@ -221,15 +221,15 @@
               },
               "Default": {
                 "id": "Default",
-                "path": "test-cdk-serverless/my-serverless-app/Default",
+                "path": "test-cdk-serverless-local/my-serverless-app-local/Default",
                 "children": {
                   "OPTIONS": {
                     "id": "OPTIONS",
-                    "path": "test-cdk-serverless/my-serverless-app/Default/OPTIONS",
+                    "path": "test-cdk-serverless-local/my-serverless-app-local/Default/OPTIONS",
                     "children": {
                       "Resource": {
                         "id": "Resource",
-                        "path": "test-cdk-serverless/my-serverless-app/Default/OPTIONS/Resource",
+                        "path": "test-cdk-serverless-local/my-serverless-app-local/Default/OPTIONS/Resource",
                         "attributes": {
                           "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
                           "aws:cdk:cloudformation:props": {
@@ -264,12 +264,12 @@
                             ],
                             "resourceId": {
                               "Fn::GetAtt": [
-                                "myserverlessapp5B3C5FBB",
+                                "myserverlessapplocal75227048",
                                 "RootResourceId"
                               ]
                             },
                             "restApiId": {
-                              "Ref": "myserverlessapp5B3C5FBB"
+                              "Ref": "myserverlessapplocal75227048"
                             }
                           }
                         },
@@ -281,249 +281,6 @@
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_apigateway.Method",
-                      "version": "2.177.0"
-                    }
-                  },
-                  "course": {
-                    "id": "course",
-                    "path": "test-cdk-serverless/my-serverless-app/Default/course",
-                    "children": {
-                      "Resource": {
-                        "id": "Resource",
-                        "path": "test-cdk-serverless/my-serverless-app/Default/course/Resource",
-                        "attributes": {
-                          "aws:cdk:cloudformation:type": "AWS::ApiGateway::Resource",
-                          "aws:cdk:cloudformation:props": {
-                            "parentId": {
-                              "Fn::GetAtt": [
-                                "myserverlessapp5B3C5FBB",
-                                "RootResourceId"
-                              ]
-                            },
-                            "pathPart": "course",
-                            "restApiId": {
-                              "Ref": "myserverlessapp5B3C5FBB"
-                            }
-                          }
-                        },
-                        "constructInfo": {
-                          "fqn": "aws-cdk-lib.aws_apigateway.CfnResource",
-                          "version": "2.177.0"
-                        }
-                      },
-                      "OPTIONS": {
-                        "id": "OPTIONS",
-                        "path": "test-cdk-serverless/my-serverless-app/Default/course/OPTIONS",
-                        "children": {
-                          "Resource": {
-                            "id": "Resource",
-                            "path": "test-cdk-serverless/my-serverless-app/Default/course/OPTIONS/Resource",
-                            "attributes": {
-                              "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
-                              "aws:cdk:cloudformation:props": {
-                                "apiKeyRequired": false,
-                                "authorizationType": "NONE",
-                                "httpMethod": "OPTIONS",
-                                "integration": {
-                                  "type": "MOCK",
-                                  "requestTemplates": {
-                                    "application/json": "{ statusCode: 200 }"
-                                  },
-                                  "integrationResponses": [
-                                    {
-                                      "statusCode": "204",
-                                      "responseParameters": {
-                                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
-                                        "method.response.header.Access-Control-Allow-Origin": "'*'",
-                                        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
-                                      }
-                                    }
-                                  ]
-                                },
-                                "methodResponses": [
-                                  {
-                                    "statusCode": "204",
-                                    "responseParameters": {
-                                      "method.response.header.Access-Control-Allow-Headers": true,
-                                      "method.response.header.Access-Control-Allow-Origin": true,
-                                      "method.response.header.Access-Control-Allow-Methods": true
-                                    }
-                                  }
-                                ],
-                                "resourceId": {
-                                  "Ref": "myserverlessappcourseECD737D6"
-                                },
-                                "restApiId": {
-                                  "Ref": "myserverlessapp5B3C5FBB"
-                                }
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
-                              "version": "2.177.0"
-                            }
-                          }
-                        },
-                        "constructInfo": {
-                          "fqn": "aws-cdk-lib.aws_apigateway.Method",
-                          "version": "2.177.0"
-                        }
-                      },
-                      "GET": {
-                        "id": "GET",
-                        "path": "test-cdk-serverless/my-serverless-app/Default/course/GET",
-                        "children": {
-                          "ApiPermission.testcdkserverlessmyserverlessapp2A5DE5B9.GET..course": {
-                            "id": "ApiPermission.testcdkserverlessmyserverlessapp2A5DE5B9.GET..course",
-                            "path": "test-cdk-serverless/my-serverless-app/Default/course/GET/ApiPermission.testcdkserverlessmyserverlessapp2A5DE5B9.GET..course",
-                            "attributes": {
-                              "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
-                              "aws:cdk:cloudformation:props": {
-                                "action": "lambda:InvokeFunction",
-                                "functionName": {
-                                  "Fn::GetAtt": [
-                                    "courseselfstage55546A7F",
-                                    "Arn"
-                                  ]
-                                },
-                                "principal": "apigateway.amazonaws.com",
-                                "sourceArn": {
-                                  "Fn::Join": [
-                                    "",
-                                    [
-                                      "arn:",
-                                      {
-                                        "Ref": "AWS::Partition"
-                                      },
-                                      ":execute-api:",
-                                      {
-                                        "Ref": "AWS::Region"
-                                      },
-                                      ":",
-                                      {
-                                        "Ref": "AWS::AccountId"
-                                      },
-                                      ":",
-                                      {
-                                        "Ref": "myserverlessapp5B3C5FBB"
-                                      },
-                                      "/",
-                                      {
-                                        "Ref": "myserverlessappDeploymentStageprodD57F7890"
-                                      },
-                                      "/GET/course"
-                                    ]
-                                  ]
-                                }
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
-                              "version": "2.177.0"
-                            }
-                          },
-                          "ApiPermission.Test.testcdkserverlessmyserverlessapp2A5DE5B9.GET..course": {
-                            "id": "ApiPermission.Test.testcdkserverlessmyserverlessapp2A5DE5B9.GET..course",
-                            "path": "test-cdk-serverless/my-serverless-app/Default/course/GET/ApiPermission.Test.testcdkserverlessmyserverlessapp2A5DE5B9.GET..course",
-                            "attributes": {
-                              "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
-                              "aws:cdk:cloudformation:props": {
-                                "action": "lambda:InvokeFunction",
-                                "functionName": {
-                                  "Fn::GetAtt": [
-                                    "courseselfstage55546A7F",
-                                    "Arn"
-                                  ]
-                                },
-                                "principal": "apigateway.amazonaws.com",
-                                "sourceArn": {
-                                  "Fn::Join": [
-                                    "",
-                                    [
-                                      "arn:",
-                                      {
-                                        "Ref": "AWS::Partition"
-                                      },
-                                      ":execute-api:",
-                                      {
-                                        "Ref": "AWS::Region"
-                                      },
-                                      ":",
-                                      {
-                                        "Ref": "AWS::AccountId"
-                                      },
-                                      ":",
-                                      {
-                                        "Ref": "myserverlessapp5B3C5FBB"
-                                      },
-                                      "/test-invoke-stage/GET/course"
-                                    ]
-                                  ]
-                                }
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
-                              "version": "2.177.0"
-                            }
-                          },
-                          "Resource": {
-                            "id": "Resource",
-                            "path": "test-cdk-serverless/my-serverless-app/Default/course/GET/Resource",
-                            "attributes": {
-                              "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
-                              "aws:cdk:cloudformation:props": {
-                                "authorizationType": "NONE",
-                                "httpMethod": "GET",
-                                "integration": {
-                                  "type": "AWS_PROXY",
-                                  "uri": {
-                                    "Fn::Join": [
-                                      "",
-                                      [
-                                        "arn:",
-                                        {
-                                          "Ref": "AWS::Partition"
-                                        },
-                                        ":apigateway:",
-                                        {
-                                          "Ref": "AWS::Region"
-                                        },
-                                        ":lambda:path/2015-03-31/functions/",
-                                        {
-                                          "Fn::GetAtt": [
-                                            "courseselfstage55546A7F",
-                                            "Arn"
-                                          ]
-                                        },
-                                        "/invocations"
-                                      ]
-                                    ]
-                                  },
-                                  "integrationHttpMethod": "POST"
-                                },
-                                "resourceId": {
-                                  "Ref": "myserverlessappcourseECD737D6"
-                                },
-                                "restApiId": {
-                                  "Ref": "myserverlessapp5B3C5FBB"
-                                }
-                              }
-                            },
-                            "constructInfo": {
-                              "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
-                              "version": "2.177.0"
-                            }
-                          }
-                        },
-                        "constructInfo": {
-                          "fqn": "aws-cdk-lib.aws_apigateway.Method",
-                          "version": "2.177.0"
-                        }
-                      }
-                    },
-                    "constructInfo": {
-                      "fqn": "aws-cdk-lib.aws_apigateway.Resource",
                       "version": "2.177.0"
                     }
                   }
@@ -541,11 +298,11 @@
           },
           "CDKMetadata": {
             "id": "CDKMetadata",
-            "path": "test-cdk-serverless/CDKMetadata",
+            "path": "test-cdk-serverless-local/CDKMetadata",
             "children": {
               "Default": {
                 "id": "Default",
-                "path": "test-cdk-serverless/CDKMetadata/Default",
+                "path": "test-cdk-serverless-local/CDKMetadata/Default",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.CfnResource",
                   "version": "2.177.0"
@@ -553,7 +310,7 @@
               },
               "Condition": {
                 "id": "Condition",
-                "path": "test-cdk-serverless/CDKMetadata/Condition",
+                "path": "test-cdk-serverless-local/CDKMetadata/Condition",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.CfnCondition",
                   "version": "2.177.0"
@@ -567,7 +324,7 @@
           },
           "BootstrapVersion": {
             "id": "BootstrapVersion",
-            "path": "test-cdk-serverless/BootstrapVersion",
+            "path": "test-cdk-serverless-local/BootstrapVersion",
             "constructInfo": {
               "fqn": "aws-cdk-lib.CfnParameter",
               "version": "2.177.0"
@@ -575,7 +332,7 @@
           },
           "CheckBootstrapVersion": {
             "id": "CheckBootstrapVersion",
-            "path": "test-cdk-serverless/CheckBootstrapVersion",
+            "path": "test-cdk-serverless-local/CheckBootstrapVersion",
             "constructInfo": {
               "fqn": "aws-cdk-lib.CfnRule",
               "version": "2.177.0"
