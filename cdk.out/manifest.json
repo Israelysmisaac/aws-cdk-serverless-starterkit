@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe6f34f32ed30f1309d82a9b108bab695eaf60c1f8dd5986231e4727db80b603.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/bd09a5504cb13d5bb5a3b78f48d801ab41d78403ea7b79e5fb9e4a7311e9cf4c.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -56,7 +56,7 @@
         "/test-cdk-serverless-local/my-serverless-app-local/Deployment/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "myserverlessapplocalDeploymentAF9F9E13a1efd9bc82a8d8143e72fb97510b0cc5"
+            "data": "myserverlessapplocalDeploymentAF9F9E13f45c2600504845845ecd9dd500535cb2"
           }
         ],
         "/test-cdk-serverless-local/my-serverless-app-local/DeploymentStage.local/Resource": [
@@ -75,6 +75,36 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "myserverlessapplocalOPTIONS1EDE5C6C"
+          }
+        ],
+        "/test-cdk-serverless-local/my-serverless-app-local/Default/course/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "myserverlessapplocalcourse3895C80C"
+          }
+        ],
+        "/test-cdk-serverless-local/my-serverless-app-local/Default/course/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "myserverlessapplocalcourseOPTIONSE1F07355"
+          }
+        ],
+        "/test-cdk-serverless-local/my-serverless-app-local/Default/course/GET/ApiPermission.testcdkserverlesslocalmyserverlessapplocal5BE23D3D.GET..course": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "myserverlessapplocalcourseGETApiPermissiontestcdkserverlesslocalmyserverlessapplocal5BE23D3DGETcourseE4690E73"
+          }
+        ],
+        "/test-cdk-serverless-local/my-serverless-app-local/Default/course/GET/ApiPermission.Test.testcdkserverlesslocalmyserverlessapplocal5BE23D3D.GET..course": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "myserverlessapplocalcourseGETApiPermissionTesttestcdkserverlesslocalmyserverlessapplocal5BE23D3DGETcourse9235FEF6"
+          }
+        ],
+        "/test-cdk-serverless-local/my-serverless-app-local/Default/course/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "myserverlessapplocalcourseGET3E47EAEA"
           }
         ],
         "/test-cdk-serverless-local/CDKMetadata/Default": [

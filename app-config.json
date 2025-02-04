@@ -12,14 +12,23 @@
     "authorizer": [
         {
             "name": "custom-auth",
-            "type": "restApi",      // restApi or websocket
-            "authFunctionName": "auth-${self.stage}"
-        },
-        {
-            "name": "cognito",
-            "type": "restApi",
-            "userPool": "user-test",
-            "tokenSource": "Authorization"
+            "type": "restApi",     
+            "function": {
+                "name": "auth-${self.stage}",
+                "runtime": "lambda.Runtime.NODEJS_22_X",
+                "handler": "index.handler",
+                "srcFile": "src/lambda-handler/course.ts",
+                "output": "dist/course-handler/index.js",
+                "memory": 256,
+                "concurrency": 10,
+                "timeout": 30,
+                "environmentVariable": {
+                    "MONGODB_URI": "localhost:db",
+                    "frontendUrl": "${env.frontendUrl}",
+                    "functionName": "${currentFunction.name}",
+                    "cors": "${env.cors}"
+                }
+            }
         }
     ],
     "vpc": [
@@ -52,7 +61,7 @@
                     "endpoint": "course",
                     "method": "GET",
                     "responseType": "application/json",
-                    "apiGatewayName": "my-serverless-app"
+                    "apiGatewayName": "my-serverless-app-${self.stage}"
                 }
             ],
             "environmentVariable": {
