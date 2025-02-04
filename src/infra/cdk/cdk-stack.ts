@@ -5,6 +5,8 @@ import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as path from 'path';
 import { interpolateConfig } from '../../config';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
+import * as apigwv2 from 'aws-cdk-lib/aws-apigatewayv2';
+import * as integrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 
 // Type definitions moved to top for better visibility
 type AuthorizerInfo = {
@@ -33,6 +35,11 @@ type AppConfig = {
     type: string;
     authenticationType: string;
     cors: string;
+  }>;
+  websocketApi?: Array<{
+    name: string;
+    routeSelectionExpression?: string;
+    stageName?: string;
   }>;
   functions: Array<{
     name: string;
@@ -65,6 +72,7 @@ export class CdkStack extends cdk.Stack {
     this.createLambdaFunctions(config);
     this.createAuthorizers(config);
     this.createApiGateways(config);
+    this.createWebSocketApis(config);
 
     console.log("Deployment completed successfully");
   }
@@ -202,5 +210,46 @@ export class CdkStack extends cdk.Stack {
       authorizer: authorizerInfo.authorizer,
       authorizationType: authorizerInfo.authType
     } : undefined;
+  }
+
+  private createWebSocketApis(config: AppConfig): void {
+    // Only proceed if websocketApi configuration exists.
+    if (!config.websocketApi || config.websocketApi.length === 0) return;
+
+    // For each websocketApi config object, create a WebSocket API, its stage, and configure its routes.
+    config.websocketApi.forEach(wsConfig => {
+      // Use the provided name, route selection expression, and stageName (or fallback to config.stage).
+      const wsApi = new apigwv2.WebSocketApi(this, interpolateConfig(config, wsConfig.name), {
+        routeSelectionExpression: wsConfig.routeSelectionExpression || '$request.body.action'
+      });
+
+      new apigwv2.WebSocketStage(this, `${wsConfig.name}-Stage`, {
+        webSocketApi: wsApi,
+        stageName: wsConfig.stageName || config.stage,
+        autoDeploy: true,
+      });
+
+      // Add routes for all functions with a "websocket" trigger.
+      this.configureWebSocketRoutes(config, wsApi);
+    });
+  }
+
+  private configureWebSocketRoutes(config: AppConfig, wsApi: apigwv2.WebSocketApi): void {
+    config.functions.forEach(fnConfig => {
+      fnConfig.triggers
+        .filter(trigger => trigger.type === "websocket")
+        .forEach(trigger => {
+          // Create a Lambda integration for the WebSocket function.
+          const lambdaFunction = this.functionMap[fnConfig.name];
+          const integration = new integrations.WebSocketLambdaIntegration(
+            interpolateConfig(config, fnConfig.name),
+            lambdaFunction
+          );
+          // The trigger's "endpoint" is used as the route key.
+          wsApi.addRoute(trigger.endpoint, {
+            integration: integration
+          });
+        });
+    });
   }
 }

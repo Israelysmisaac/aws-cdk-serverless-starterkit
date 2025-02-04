@@ -44,6 +44,13 @@
             "cors": "${env.cors}"
         }
     ],
+    "websocketApi": [
+        {
+            "name": "my-websocket-api-${self.stage}",
+            "routeSelectionExpression": "$request.body.action",
+            "stageName": "${self.stage}"
+        }
+    ],
     "functions": [
         {
             "name": "course-${self.stage}",
@@ -62,6 +69,10 @@
                     "method": "GET",
                     "responseType": "application/json",
                     "apiGatewayName": "my-serverless-app-${self.stage}"
+                },
+                {
+                    "type": "websocket",
+                    "endpoint": "$default"
                 }
             ],
             "environmentVariable": {
