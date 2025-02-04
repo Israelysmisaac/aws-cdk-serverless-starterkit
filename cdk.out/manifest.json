@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/bd09a5504cb13d5bb5a3b78f48d801ab41d78403ea7b79e5fb9e4a7311e9cf4c.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/42e46135025c2b1d87a879e1a64c2c569b3959e39ec22a55b0a007d071ba69be.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -47,6 +47,30 @@
             "data": "courselocal47E348A5"
           }
         ],
+        "/test-cdk-serverless-local/auth-local/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authlocalServiceRole5F1DABA5"
+          }
+        ],
+        "/test-cdk-serverless-local/auth-local/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authlocalE4FF3CC9"
+          }
+        ],
+        "/test-cdk-serverless-local/auth-local/testcdkserverlesslocalTokenAuthorizercustomauth31912A0A:Permissions": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "authlocaltestcdkserverlesslocalTokenAuthorizercustomauth31912A0APermissions80589A67"
+          }
+        ],
+        "/test-cdk-serverless-local/TokenAuthorizer-custom-auth/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TokenAuthorizercustomauthA7AF5865"
+          }
+        ],
         "/test-cdk-serverless-local/my-serverless-app-local/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -56,7 +80,7 @@
         "/test-cdk-serverless-local/my-serverless-app-local/Deployment/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "myserverlessapplocalDeploymentAF9F9E13f45c2600504845845ecd9dd500535cb2"
+            "data": "myserverlessapplocalDeploymentAF9F9E132a399e1cfc5a89d3a001e376c24077f2"
           }
         ],
         "/test-cdk-serverless-local/my-serverless-app-local/DeploymentStage.local/Resource": [

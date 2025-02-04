@@ -136,6 +136,261 @@
               "version": "2.177.0"
             }
           },
+          "auth-local": {
+            "id": "auth-local",
+            "path": "test-cdk-serverless-local/auth-local",
+            "children": {
+              "ServiceRole": {
+                "id": "ServiceRole",
+                "path": "test-cdk-serverless-local/auth-local/ServiceRole",
+                "children": {
+                  "ImportServiceRole": {
+                    "id": "ImportServiceRole",
+                    "path": "test-cdk-serverless-local/auth-local/ServiceRole/ImportServiceRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.177.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "test-cdk-serverless-local/auth-local/ServiceRole/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "lambda.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "managedPolicyArns": [
+                          {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "arn:",
+                                {
+                                  "Ref": "AWS::Partition"
+                                },
+                                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                              ]
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.177.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Role",
+                  "version": "2.177.0"
+                }
+              },
+              "Code": {
+                "id": "Code",
+                "path": "test-cdk-serverless-local/auth-local/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "test-cdk-serverless-local/auth-local/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.177.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "test-cdk-serverless-local/auth-local/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.177.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.177.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "test-cdk-serverless-local/auth-local/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": {
+                        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+                      },
+                      "s3Key": "4fb27c3ca67fe6528a29ff1fd7450ac2df3d9ddcb4634a71b36ff52956e0e570.zip"
+                    },
+                    "environment": {
+                      "variables": {
+                        "MONGODB_URI": "localhost:db",
+                        "frontendUrl": "${env.frontendUrl}",
+                        "functionName": "auth-local",
+                        "cors": "${env.cors}"
+                      }
+                    },
+                    "handler": "index.handler",
+                    "role": {
+                      "Fn::GetAtt": [
+                        "authlocalServiceRole5F1DABA5",
+                        "Arn"
+                      ]
+                    },
+                    "runtime": "nodejs22.x"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.177.0"
+                }
+              },
+              "testcdkserverlesslocalTokenAuthorizercustomauth31912A0A:Permissions": {
+                "id": "testcdkserverlesslocalTokenAuthorizercustomauth31912A0A:Permissions",
+                "path": "test-cdk-serverless-local/auth-local/testcdkserverlesslocalTokenAuthorizercustomauth31912A0A:Permissions",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                  "aws:cdk:cloudformation:props": {
+                    "action": "lambda:InvokeFunction",
+                    "functionName": {
+                      "Fn::GetAtt": [
+                        "authlocalE4FF3CC9",
+                        "Arn"
+                      ]
+                    },
+                    "principal": "apigateway.amazonaws.com",
+                    "sourceArn": {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:",
+                          {
+                            "Ref": "AWS::Partition"
+                          },
+                          ":execute-api:",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ":",
+                          {
+                            "Ref": "AWS::AccountId"
+                          },
+                          ":",
+                          {
+                            "Ref": "myserverlessapplocal75227048"
+                          },
+                          "/authorizers/",
+                          {
+                            "Ref": "TokenAuthorizercustomauthA7AF5865"
+                          }
+                        ]
+                      ]
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                  "version": "2.177.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.177.0"
+            }
+          },
+          "TokenAuthorizer-custom-auth": {
+            "id": "TokenAuthorizer-custom-auth",
+            "path": "test-cdk-serverless-local/TokenAuthorizer-custom-auth",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "test-cdk-serverless-local/TokenAuthorizer-custom-auth/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::Authorizer",
+                  "aws:cdk:cloudformation:props": {
+                    "authorizerResultTtlInSeconds": 300,
+                    "authorizerUri": {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:",
+                          {
+                            "Fn::Select": [
+                              1,
+                              {
+                                "Fn::Split": [
+                                  ":",
+                                  {
+                                    "Fn::GetAtt": [
+                                      "authlocalE4FF3CC9",
+                                      "Arn"
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          ":apigateway:",
+                          {
+                            "Fn::Select": [
+                              3,
+                              {
+                                "Fn::Split": [
+                                  ":",
+                                  {
+                                    "Fn::GetAtt": [
+                                      "authlocalE4FF3CC9",
+                                      "Arn"
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          ":lambda:path/2015-03-31/functions/",
+                          {
+                            "Fn::GetAtt": [
+                              "authlocalE4FF3CC9",
+                              "Arn"
+                            ]
+                          },
+                          "/invocations"
+                        ]
+                      ]
+                    },
+                    "identitySource": "method.request.header.Authorization",
+                    "name": "testcdkserverlesslocalTokenAuthorizercustomauth31912A0A",
+                    "restApiId": {
+                      "Ref": "myserverlessapplocal75227048"
+                    },
+                    "type": "TOKEN"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_apigateway.CfnAuthorizer",
+                  "version": "2.177.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_apigateway.TokenAuthorizer",
+              "version": "2.177.0"
+            }
+          },
           "my-serverless-app-local": {
             "id": "my-serverless-app-local",
             "path": "test-cdk-serverless-local/my-serverless-app-local",
@@ -192,7 +447,7 @@
                       "aws:cdk:cloudformation:type": "AWS::ApiGateway::Stage",
                       "aws:cdk:cloudformation:props": {
                         "deploymentId": {
-                          "Ref": "myserverlessapplocalDeploymentAF9F9E13f45c2600504845845ecd9dd500535cb2"
+                          "Ref": "myserverlessapplocalDeploymentAF9F9E132a399e1cfc5a89d3a001e376c24077f2"
                         },
                         "restApiId": {
                           "Ref": "myserverlessapplocal75227048"
@@ -473,7 +728,10 @@
                             "attributes": {
                               "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
                               "aws:cdk:cloudformation:props": {
-                                "authorizationType": "NONE",
+                                "authorizationType": "CUSTOM",
+                                "authorizerId": {
+                                  "Ref": "TokenAuthorizercustomauthA7AF5865"
+                                },
                                 "httpMethod": "GET",
                                 "integration": {
                                   "type": "AWS_PROXY",

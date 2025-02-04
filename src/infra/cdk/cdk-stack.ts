@@ -2,13 +2,17 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
-import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { interpolateConfig } from '../../config';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
-// import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
-interface AppConfig {
+// Type definitions moved to top for better visibility
+type AuthorizerInfo = {
+  authorizer: apigateway.IAuthorizer;
+  authType: apigateway.AuthorizationType;
+};
+
+type AppConfig = {
   appName: string;
   version: string;
   region: string;
@@ -49,131 +53,154 @@ interface AppConfig {
     }>;
     environmentVariable: Record<string, string>;
   }>;
-}
-
-type Config = {
-  [key: string]: string;
-};
-
-type AuthorizerInfo = {
-  authorizer: apigateway.IAuthorizer;
-  authType: apigateway.AuthorizationType;
 };
 
 export class CdkStack extends cdk.Stack {
+  private functionMap: Record<string, lambda.Function> = {};
+  private authorizers: Record<string, AuthorizerInfo> = {};
+
   constructor(scope: Construct, id: string, config: AppConfig, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Look up the VPC
-    // const vpc = ec2.Vpc.fromLookup(this, 'VPC', {
-    //   vpcName: config.vpc[0].name,
-    // });
+    this.createLambdaFunctions(config);
+    this.createAuthorizers(config);
+    this.createApiGateways(config);
 
-    // Create Lambda functions
-    const functionMap: Record<string, lambda.Function> = {};
-    config.functions.forEach((fnConfig) => {
-      const environmentVariables = Object.fromEntries(
-        Object.entries(fnConfig.environmentVariable).map(([key, value]) => [
-          key,
-          interpolateConfig(config , value.replace('${currentFunction.name}', fnConfig.name)),
-        ])
-      );
-
-      const lambdaFunction = new lambda.Function(this, interpolateConfig(config, fnConfig.name), {
-        runtime: lambda.Runtime.NODEJS_22_X,
-        code: lambda.Code.fromAsset(path.resolve(__dirname, fnConfig.output).replace("/src/infra/cdk", "").replace("index.js", "") ),
-        handler: fnConfig.handler,
-        environment: environmentVariables,
-        // vpc: vpc,
-        // vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
-      });
-
-      functionMap[fnConfig.name] = lambdaFunction;
-    });
-
-    // Create authorizers
-    const authorizers: Record<string, AuthorizerInfo> = {};
-    config.authorizer.forEach(authConfig => {
-      const authName = authConfig.name;
-      if (authConfig.type === 'restApi') {
-        if (authName === 'custom-auth' && authConfig.function.name) {
-          const authFunctionName = interpolateConfig(config, authConfig.function.name);
-          // const authLambda = lambda.Function.fromFunctionName(this, `AuthLambda-${authName}`, authFunctionName);
-          const authLambda = new lambda.Function(this, interpolateConfig(config, authFunctionName), {
-            runtime: lambda.Runtime.NODEJS_22_X,
-            code: lambda.Code.fromAsset(path.resolve(__dirname, authConfig.function.output).replace("/src/infra/cdk", "").replace("index.js", "") ),
-            handler: authConfig.function.handler,
-            environment: authConfig.function.environmentVariables,
-            // vpc: vpc,
-            // vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
-          });
-          const authorizer = new apigateway.TokenAuthorizer(this, `TokenAuthorizer-${authName}`, {
-            handler: authLambda,
-            identitySource: 'method.request.header.Authorization',
-          });
-          authorizers[authName] = {
-            authorizer: authorizer,
-            authType: apigateway.AuthorizationType.CUSTOM,
-          };
-        } else if (authName === 'cognito' && authConfig.userPool && authConfig.tokenSource) {
-          const userPoolId = interpolateConfig(config, authConfig.userPool);
-          const userPool = cognito.UserPool.fromUserPoolId(this, `UserPool-${authName}`, userPoolId);
-          const cognitoAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(this, `CognitoAuthorizer-${authName}`, {
-            cognitoUserPools: [userPool],
-            identitySource: authConfig.tokenSource,
-          });
-          authorizers[authName] = {
-            authorizer: cognitoAuthorizer,
-            authType: apigateway.AuthorizationType.COGNITO,
-          };
-        }
-      }
-    });
-
-    // Create API Gateway and integrate with Lambda functions
-    config.apiGateway.forEach((apiConfig) => {
-      const api = new apigateway.RestApi(this, interpolateConfig(config, apiConfig.name), {
-        restApiName: interpolateConfig(config, apiConfig.name),
-        deploy: true,
-        deployOptions: {
-          stageName: config.stage,  // Use stage from config
-        },
-        defaultCorsPreflightOptions: apiConfig.cors
-          ? {
-              allowOrigins: apigateway.Cors.ALL_ORIGINS,
-              allowMethods: apigateway.Cors.ALL_METHODS,
-            }
-          : undefined,
-      });
-
-      config.functions.forEach((fnConfig) => {
-        fnConfig.triggers
-          .filter((trigger) => trigger.apiGatewayName === apiConfig.name)
-          .forEach((trigger) => {
-            const lambdaIntegration = new apigateway.LambdaIntegration(functionMap[fnConfig.name], {
-              proxy: true,
-            });
-            
-            const resource = api.root.addResource(trigger.endpoint);
-
-            let methodOptions: any = {};
-            if (fnConfig.authorizer) {
-              const authorizerInfo = authorizers[fnConfig.authorizer];
-              if (authorizerInfo) {
-                methodOptions.authorizer = authorizerInfo.authorizer;
-                methodOptions.authorizationType = authorizerInfo.authType;
-              }
-              resource.addMethod(trigger.method, lambdaIntegration, methodOptions);
-            } else {
-              resource.addMethod(trigger.method, lambdaIntegration);
-            }
-
-            
-          });
-      });
-    });
-
-    console.log("done")
+    console.log("Deployment completed successfully");
   }
-  
+
+  private createLambdaFunctions(config: AppConfig): void {
+    this.functionMap = config.functions.reduce((acc, fnConfig) => ({
+      ...acc,
+      [fnConfig.name]: this.createLambdaFunction(config, fnConfig)
+    }), {});
+  }
+
+  private createLambdaFunction(config: AppConfig, fnConfig: AppConfig['functions'][0]): lambda.Function {
+    return new lambda.Function(this, interpolateConfig(config, fnConfig.name), {
+      runtime: lambda.Runtime.NODEJS_22_X,
+      code: lambda.Code.fromAsset(this.getLambdaAssetPath(fnConfig)),
+      handler: fnConfig.handler,
+      environment: this.createLambdaEnvironment(config, fnConfig),
+    });
+  }
+
+  private getLambdaAssetPath(fnConfig: AppConfig['functions'][0]): string {
+    return path.resolve(__dirname, fnConfig.output)
+      .replace("/src/infra/cdk", "")
+      .replace("index.js", "");
+  }
+
+  private createLambdaEnvironment(config: AppConfig, fnConfig: AppConfig['functions'][0]): Record<string, string> {
+    return Object.fromEntries(
+      Object.entries(fnConfig.environmentVariable).map(([key, value]) => [
+        key,
+        interpolateConfig(config, value.replace('${currentFunction.name}', fnConfig.name)),
+      ])
+    );
+  }
+
+  private createAuthorizers(config: AppConfig): void {
+    this.authorizers = config.authorizer.reduce((acc, authConfig) => ({
+      ...acc,
+      [authConfig.name]: this.createAuthorizer(config, authConfig)
+    }), {});
+  }
+
+  private createAuthorizer(config: AppConfig, authConfig: AppConfig['authorizer'][0]): AuthorizerInfo {
+    switch (authConfig.type) {
+      case 'restApi':
+        return this.createRestApiAuthorizer(config, authConfig);
+      default:
+        throw new Error(`Unsupported authorizer type: ${authConfig.type}`);
+    }
+  }
+
+  private createRestApiAuthorizer(config: AppConfig, authConfig: AppConfig['authorizer'][0]): AuthorizerInfo {
+    if (authConfig.name === 'custom-auth') {
+      return this.createCustomAuthorizer(config, authConfig);
+    }
+    if (authConfig.name === 'cognito') {
+      return this.createCognitoAuthorizer(config, authConfig);
+    }
+    throw new Error(`Unknown authorizer type: ${authConfig.name}`);
+  }
+
+  private createCustomAuthorizer(config: AppConfig, authConfig: AppConfig['authorizer'][0]): AuthorizerInfo {
+    const authFunction = this.createLambdaFunction(config, authConfig.function);
+    const authorizer = new apigateway.TokenAuthorizer(this, `TokenAuthorizer-${authConfig.name}`, {
+      handler: authFunction,
+      identitySource: 'method.request.header.Authorization',
+    });
+
+    return {
+      authorizer,
+      authType: apigateway.AuthorizationType.CUSTOM
+    };
+  }
+
+  private createCognitoAuthorizer(config: AppConfig, authConfig: AppConfig['authorizer'][0]): AuthorizerInfo {
+    const userPoolId = interpolateConfig(config, authConfig.userPool!);
+    const userPool = cognito.UserPool.fromUserPoolId(this, `UserPool-${authConfig.name}`, userPoolId);
+    const authorizer = new apigateway.CognitoUserPoolsAuthorizer(this, `CognitoAuthorizer-${authConfig.name}`, {
+      cognitoUserPools: [userPool],
+      identitySource: authConfig.tokenSource!,
+    });
+
+    return {
+      authorizer,
+      authType: apigateway.AuthorizationType.COGNITO
+    };
+  }
+
+  private createApiGateways(config: AppConfig): void {
+    config.apiGateway.forEach(apiConfig => {
+      const api = this.createApiGateway(config, apiConfig);
+      this.configureApiGatewayEndpoints(config, api, apiConfig);
+    });
+  }
+
+  private createApiGateway(config: AppConfig, apiConfig: AppConfig['apiGateway'][0]): apigateway.RestApi {
+    return new apigateway.RestApi(this, interpolateConfig(config, apiConfig.name), {
+      restApiName: interpolateConfig(config, apiConfig.name),
+      deploy: true,
+      deployOptions: { stageName: config.stage },
+      defaultCorsPreflightOptions: this.getCorsOptions(apiConfig)
+    });
+  }
+
+  private getCorsOptions(apiConfig: AppConfig['apiGateway'][0]): apigateway.CorsOptions | undefined {
+    return apiConfig.cors ? {
+      allowOrigins: apigateway.Cors.ALL_ORIGINS,
+      allowMethods: apigateway.Cors.ALL_METHODS,
+    } : undefined;
+  }
+
+  private configureApiGatewayEndpoints(config: AppConfig, api: apigateway.RestApi, apiConfig: AppConfig['apiGateway'][0]): void {
+    config.functions.forEach(fnConfig => {
+      fnConfig.triggers
+        .filter(trigger => trigger.apiGatewayName === apiConfig.name)
+        .forEach(trigger => {
+          this.configureApiEndpoint(api, fnConfig, trigger);
+        });
+    });
+  }
+
+  private configureApiEndpoint(api: apigateway.RestApi, fnConfig: AppConfig['functions'][0], trigger: AppConfig['functions'][0]['triggers'][0]): void {
+    const resource = api.root.addResource(trigger.endpoint);
+    const integration = new apigateway.LambdaIntegration(this.functionMap[fnConfig.name], { proxy: true });
+    const methodOptions = this.getAuthorizerMethodOptions(fnConfig);
+
+    resource.addMethod(trigger.method, integration, methodOptions);
+  }
+
+  private getAuthorizerMethodOptions(fnConfig: AppConfig['functions'][0]): apigateway.MethodOptions | undefined {
+    if (!fnConfig.authorizer) return undefined;
+
+    const authorizerInfo = this.authorizers[fnConfig.authorizer];
+    return authorizerInfo ? {
+      authorizer: authorizerInfo.authorizer,
+      authorizationType: authorizerInfo.authType
+    } : undefined;
+  }
 }
