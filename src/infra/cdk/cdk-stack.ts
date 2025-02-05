@@ -7,6 +7,10 @@ import { interpolateConfig } from '../../config';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as apigwv2 from 'aws-cdk-lib/aws-apigatewayv2';
 import * as integrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
+import * as agwa from "aws-cdk-lib/aws-apigatewayv2-authorizers";
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 // Type definitions moved to top for better visibility
 type AuthorizerInfo = {
@@ -47,7 +51,6 @@ type AppConfig = {
     handler: string;
     srcFile: string;
     output: string;
-    authorizer?: string;
     memory?: number;
     concurrency?: number;
     timeout?: number;
@@ -57,6 +60,9 @@ type AppConfig = {
       method: string;
       responseType: string;
       apiGatewayName: string;
+      authorizer?: string;
+      bucketName?: string;
+      bucketEvents?: Array<Record<string, string>>;
     }>;
     environmentVariable: Record<string, string>;
   }>;
@@ -73,6 +79,7 @@ export class CdkStack extends cdk.Stack {
     this.createAuthorizers(config);
     this.createApiGateways(config);
     this.createWebSocketApis(config);
+    // this.configureS3Events(config)
 
     console.log("Deployment completed successfully");
   }
@@ -115,10 +122,12 @@ export class CdkStack extends cdk.Stack {
     }), {});
   }
 
-  private createAuthorizer(config: AppConfig, authConfig: AppConfig['authorizer'][0]): AuthorizerInfo {
+  private createAuthorizer(config: AppConfig, authConfig: AppConfig['authorizer'][0]): AuthorizerInfo | cdk.aws_apigatewayv2_authorizers.WebSocketLambdaAuthorizer {
     switch (authConfig.type) {
       case 'restApi':
         return this.createRestApiAuthorizer(config, authConfig);
+      case 'websocket':
+        return this.createWebsocketAuthorizer(config, authConfig);
       default:
         throw new Error(`Unsupported authorizer type: ${authConfig.type}`);
     }
@@ -161,6 +170,21 @@ export class CdkStack extends cdk.Stack {
     };
   }
 
+  private createWebsocketAuthorizer(config: AppConfig, authConfig: AppConfig['authorizer'][0]): cdk.aws_apigatewayv2_authorizers.WebSocketLambdaAuthorizer {
+    if (authConfig.name === 'custom-auth') {
+      const authFunction = this.createLambdaFunction(config, authConfig.function);
+      const authorizer = new agwa.WebSocketLambdaAuthorizer(
+        "Authorizer",
+        authFunction,
+        {
+          identitySource: [`route.request.querystring.key`],
+        }
+      );
+      return authorizer;
+    }
+    throw new Error(`Unknown authorizer type: ${authConfig.name}`);
+  }
+
   private createApiGateways(config: AppConfig): void {
     config.apiGateway.forEach(apiConfig => {
       const api = this.createApiGateway(config, apiConfig);
@@ -197,15 +221,15 @@ export class CdkStack extends cdk.Stack {
   private configureApiEndpoint(api: apigateway.RestApi, fnConfig: AppConfig['functions'][0], trigger: AppConfig['functions'][0]['triggers'][0]): void {
     const resource = api.root.addResource(trigger.endpoint);
     const integration = new apigateway.LambdaIntegration(this.functionMap[fnConfig.name], { proxy: true });
-    const methodOptions = this.getAuthorizerMethodOptions(fnConfig);
+    const methodOptions = this.getAuthorizerMethodOptions(trigger);
 
     resource.addMethod(trigger.method, integration, methodOptions);
   }
 
-  private getAuthorizerMethodOptions(fnConfig: AppConfig['functions'][0]): apigateway.MethodOptions | undefined {
-    if (!fnConfig.authorizer) return undefined;
+  private getAuthorizerMethodOptions(trigger: AppConfig['functions'][0]['triggers'][0]): apigateway.MethodOptions | undefined {
+    if (!trigger.authorizer) return undefined;
 
-    const authorizerInfo = this.authorizers[fnConfig.authorizer];
+    const authorizerInfo = this.authorizers[trigger.authorizer];
     return authorizerInfo ? {
       authorizer: authorizerInfo.authorizer,
       authorizationType: authorizerInfo.authType
@@ -245,11 +269,54 @@ export class CdkStack extends cdk.Stack {
             interpolateConfig(config, fnConfig.name),
             lambdaFunction
           );
-          // The trigger's "endpoint" is used as the route key.
-          wsApi.addRoute(trigger.endpoint, {
-            integration: integration
-          });
+          if(trigger.authorizer){
+            const authorizerInfo = this.authorizers[trigger.authorizer];
+            // The trigger's "endpoint" is used as the route key.
+            wsApi.addRoute(trigger.endpoint, {
+              integration: integration,
+              authorizer: authorizerInfo.authorizer as unknown as apigwv2.IWebSocketRouteAuthorizer
+            });
+          }else{
+            // The trigger's "endpoint" is used as the route key.
+            wsApi.addRoute(trigger.endpoint, {
+              integration: integration
+            });
+          }
+          
         });
+    });
+  }
+
+  private configureS3Events(config: AppConfig): void {
+    config.functions.forEach(fnConfig => {
+      fnConfig.triggers
+        .filter(trigger => trigger.type === "s3event")
+        .forEach(trigger => {
+          if(trigger.bucketName){
+            this.addS3BucketTrigger(trigger.bucketName, fnConfig.name)
+          }
+        })
+    })
+  }
+
+  private addS3BucketTrigger(bucketName: string, functionName: string){
+    // Reference existing S3 bucket
+    const bucket = s3.Bucket.fromBucketName(this, 'PhotosBucket', bucketName);
+    const lambdaFunction = this.functionMap[functionName];
+    // Add S3 event notification with filters
+    bucket.addEventNotification(
+      s3.EventType.OBJECT_CREATED,
+      new s3n.LambdaDestination(lambdaFunction),
+      {
+        prefix: 'uploads/',
+        suffix: '.jpg'
+      }
+    );
+
+    // Grant S3 permissions to invoke Lambda (required when using imported bucket)
+    lambdaFunction.addPermission('AllowS3Invocation', {
+      principal: new iam.ServicePrincipal('s3.amazonaws.com'),
+      sourceArn: bucket.bucketArn
     });
   }
 }

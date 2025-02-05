@@ -12,7 +12,7 @@
     "noEmit": true,
     "moduleResolution":"node",
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
   },
-  "exclude": ["node_modules", "**/*.test.ts", "cdk.out"]
+  "exclude": ["node_modules", "**/*.test.ts", "cdk.out", "bin/**", "builder.ts", "deploy.ts"]
 }
