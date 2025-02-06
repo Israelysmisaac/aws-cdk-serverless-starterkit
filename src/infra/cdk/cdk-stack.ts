@@ -249,7 +249,7 @@ export class CdkStack extends cdk.Stack {
 
       new apigwv2.WebSocketStage(this, `${wsConfig.name}-Stage`, {
         webSocketApi: wsApi,
-        stageName: wsConfig.stageName || config.stage,
+        stageName: interpolateConfig(config, wsConfig.stageName || config.stage),
         autoDeploy: true,
       });
 

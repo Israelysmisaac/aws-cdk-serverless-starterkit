@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node builder.js",
+    "build": "ts-node builder.ts",
     "deploy": "ts-node deploy",
     "start": "nodemon --exec ts-node src/app/server.ts"
   },

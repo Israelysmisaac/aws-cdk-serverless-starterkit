@@ -7,6 +7,7 @@ type Functions = {
 };
 
 const handlers = appConfig.functions;
+const authHandlers = appConfig.authorizer;
 
 const commonBuildOptions: esbuild.BuildOptions = {
   bundle: true,
@@ -18,7 +19,24 @@ const commonBuildOptions: esbuild.BuildOptions = {
   external: [],  // Add any external dependencies here if needed (e.g., 'aws-sdk' for Lambdas)
 };
 
-const buildAll = async (): Promise<void> => {
+const buildAuthFunctions = async (): Promise<void> => {
+  try {
+    for (let item of authHandlers) {
+      const srcFile = item.function.srcFile;
+      const output = item.function.output;
+      await esbuild.build({
+        entryPoints: [srcFile],
+        outfile: output,
+        ...commonBuildOptions,
+      });
+      console.log(`Built ${output}`);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const buildFunctions = async (): Promise<void> => {
   try {
     for (const { srcFile, output } of handlers) {
       await esbuild.build({
@@ -32,3 +50,6 @@ const buildAll = async (): Promise<void> => {
     console.error(error);
   }
 };
+
+buildAuthFunctions();
+buildFunctions();

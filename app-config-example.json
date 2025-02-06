@@ -1,0 +1,125 @@
+{
+    "appName": "CDK lambda",
+    "version": "1.0.0",
+    "region": "ap-south-1",
+    "stage": "local",
+    "provider": "aws",
+    "envFile": {
+        "local": "../environment/.local.env",
+        "dev": "../environment/.dev.env",
+        "production": "../environment/.production.env"
+    },
+    "authorizer": [
+        {
+            "name": "custom-auth",
+            "type": "restApi",     
+            "function": {
+                "name": "auth-${self.stage}",
+                "runtime": "lambda.Runtime.NODEJS_22_X",
+                "handler": "index.handler",
+                "srcFile": "src/lambda-handler/course.ts",
+                "output": "dist/course-handler/index.js",
+                "memory": 256,
+                "concurrency": 10,
+                "timeout": 30,
+                "environmentVariable": {
+                    "MONGODB_URI": "localhost:db",
+                    "frontendUrl": "${env.frontendUrl}",
+                    "functionName": "${currentFunction.name}",
+                    "cors": "${env.cors}"
+                }
+            }
+        },
+        {
+            "name": "custom-websocket-auth",
+            "type": "websocket",     
+            "function": {
+                "name": "websocket-auth-${self.stage}",
+                "runtime": "lambda.Runtime.NODEJS_22_X",
+                "handler": "index.handler",
+                "srcFile": "src/lambda-handler/course.ts",
+                "output": "dist/course-handler/index.js",
+                "memory": 256,
+                "concurrency": 10,
+                "timeout": 30,
+                "environmentVariable": {
+                    "MONGODB_URI": "localhost:db",
+                    "frontendUrl": "${env.frontendUrl}",
+                    "functionName": "${currentFunction.name}",
+                    "cors": "${env.cors}"
+                }
+            }
+        }
+    ],
+    "vpc": [
+        {
+            "name": "vpc-1"
+        }
+    ],
+    "apiGateway": [
+        {
+            "name": "my-serverless-app-${self.stage}",
+            "type": "http",
+            "authenticationType": "custom",
+            "cors": "${env.cors}"
+        }
+    ],
+    "websocketApi": [
+        {
+            "name": "my-websocket-api-${self.stage}",
+            "routeSelectionExpression": "$request.body.action",
+            "stageName": "${self.stage}"
+        }
+    ],
+    "functions": [
+        {
+            "name": "course-${self.stage}",
+            "runtime": "lambda.Runtime.NODEJS_22_X",
+            "handler": "index.handler",
+            "srcFile": "src/lambda-handler/course.ts",
+            "output": "dist/course-handler/index.js",
+            "memory": 256,
+            "concurrency": 10,
+            "timeout": 30,
+            "triggers": [
+                {
+                    "type": "http",
+                    "endpoint": "course",
+                    "method": "GET",
+                    "responseType": "application/json",
+                    "apiGatewayName": "my-serverless-app-${self.stage}",
+                    "authorizer": "custom-auth"
+                },
+                {
+                    "type": "websocket",
+                    "endpoint": "$default",
+                    "authorizer": "custom-auth"
+                },
+                {
+                    "type": "url",
+                    "endpoint": "$default",
+                    "authorizer": "custom-auth"
+                },
+                {
+                    "type": "s3event",
+                    "bucketName": "photos",
+                    "bucketEvents": [
+                        {
+                            "type": "created",
+                            "rules": {
+                                "prefix": "upload/",
+                                "suffix": ".jpg"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "environmentVariable": {
+                "MONGODB_URI": "localhost:db",
+                "frontendUrl": "${env.frontendUrl}",
+                "functionName": "${currentFunction.name}",
+                "cors": "${env.cors}"
+            }
+        }
+    ]
+}

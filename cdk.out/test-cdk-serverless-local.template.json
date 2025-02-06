@@ -1,6 +1,6 @@
 {
  "Resources": {
-  "courselocalServiceRole47834F7A": {
+  "hellolocalServiceRoleB656724C": {
    "Type": "AWS::IAM::Role",
    "Properties": {
     "AssumeRolePolicyDocument": {
@@ -31,41 +31,251 @@
     ]
    },
    "Metadata": {
-    "aws:cdk:path": "test-cdk-serverless-local/course-local/ServiceRole/Resource"
+    "aws:cdk:path": "test-cdk-serverless-local/hello-local/ServiceRole/Resource"
    }
   },
-  "courselocal47E348A5": {
+  "hellolocal4BEF6333": {
    "Type": "AWS::Lambda::Function",
    "Properties": {
     "Code": {
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "4fb27c3ca67fe6528a29ff1fd7450ac2df3d9ddcb4634a71b36ff52956e0e570.zip"
+     "S3Key": "498de2bdff49f1bcbb5d0725aa1bd16988a024c6eec606c42f8824f1f8649e51.zip"
     },
     "Environment": {
      "Variables": {
       "MONGODB_URI": "localhost:db",
       "frontendUrl": "${env.frontendUrl}",
-      "functionName": "course-local",
+      "functionName": "hello-local",
       "cors": "${env.cors}"
      }
     },
     "Handler": "index.handler",
     "Role": {
      "Fn::GetAtt": [
-      "courselocalServiceRole47834F7A",
+      "hellolocalServiceRoleB656724C",
       "Arn"
      ]
     },
     "Runtime": "nodejs22.x"
    },
    "DependsOn": [
-    "courselocalServiceRole47834F7A"
+    "hellolocalServiceRoleB656724C"
    ],
    "Metadata": {
-    "aws:cdk:path": "test-cdk-serverless-local/course-local/Resource",
-    "aws:asset:path": "asset.4fb27c3ca67fe6528a29ff1fd7450ac2df3d9ddcb4634a71b36ff52956e0e570",
+    "aws:cdk:path": "test-cdk-serverless-local/hello-local/Resource",
+    "aws:asset:path": "asset.498de2bdff49f1bcbb5d0725aa1bd16988a024c6eec606c42f8824f1f8649e51",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "connectlocalServiceRole487995D3": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/connect-local/ServiceRole/Resource"
+   }
+  },
+  "connectlocal190D4238": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "902733cd514d2e2cbf9cda772ed2322e6884fe8d97a66e59eb193fbcd17e7374.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "MONGODB_URI": "localhost:db",
+      "frontendUrl": "${env.frontendUrl}",
+      "functionName": "connect-local",
+      "cors": "${env.cors}"
+     }
+    },
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "connectlocalServiceRole487995D3",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x"
+   },
+   "DependsOn": [
+    "connectlocalServiceRole487995D3"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/connect-local/Resource",
+    "aws:asset:path": "asset.902733cd514d2e2cbf9cda772ed2322e6884fe8d97a66e59eb193fbcd17e7374",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "disconnectlocalServiceRole0BCD3A72": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/disconnect-local/ServiceRole/Resource"
+   }
+  },
+  "disconnectlocal73EF9116": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "511de1962094010aeca938265ec9afdf832a4dd4f7c340f0ca5b6a10d4c53dd9.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "MONGODB_URI": "localhost:db",
+      "frontendUrl": "${env.frontendUrl}",
+      "functionName": "disconnect-local",
+      "cors": "${env.cors}"
+     }
+    },
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "disconnectlocalServiceRole0BCD3A72",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x"
+   },
+   "DependsOn": [
+    "disconnectlocalServiceRole0BCD3A72"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/disconnect-local/Resource",
+    "aws:asset:path": "asset.511de1962094010aeca938265ec9afdf832a4dd4f7c340f0ca5b6a10d4c53dd9",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "defaultlocalServiceRole763B94F1": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/default-local/ServiceRole/Resource"
+   }
+  },
+  "defaultlocalD20E00DC": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "e4a108865879970bb7c2c379492a28196d0808f05b612307c97692e6ef1a5a03.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "MONGODB_URI": "localhost:db",
+      "frontendUrl": "${env.frontendUrl}",
+      "functionName": "default-local",
+      "cors": "${env.cors}"
+     }
+    },
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "defaultlocalServiceRole763B94F1",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x"
+   },
+   "DependsOn": [
+    "defaultlocalServiceRole763B94F1"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/default-local/Resource",
+    "aws:asset:path": "asset.e4a108865879970bb7c2c379492a28196d0808f05b612307c97692e6ef1a5a03",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -111,7 +321,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "4fb27c3ca67fe6528a29ff1fd7450ac2df3d9ddcb4634a71b36ff52956e0e570.zip"
+     "S3Key": "a7fa4fc6600d9284c99f0b94d08acaa5d8a617d3622358d1ecd5676edcaa2fd4.zip"
     },
     "Environment": {
      "Variables": {
@@ -135,7 +345,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "test-cdk-serverless-local/auth-local/Resource",
-    "aws:asset:path": "asset.4fb27c3ca67fe6528a29ff1fd7450ac2df3d9ddcb4634a71b36ff52956e0e570",
+    "aws:asset:path": "asset.a7fa4fc6600d9284c99f0b94d08acaa5d8a617d3622358d1ecd5676edcaa2fd4",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -256,7 +466,7 @@
     "aws:cdk:path": "test-cdk-serverless-local/my-serverless-app-local/Resource"
    }
   },
-  "myserverlessapplocalDeploymentAF9F9E132a399e1cfc5a89d3a001e376c24077f2": {
+  "myserverlessapplocalDeploymentAF9F9E138dd9d49078048a4890442931246b0ba1": {
    "Type": "AWS::ApiGateway::Deployment",
    "Properties": {
     "Description": "Automatically created by the RestApi construct",
@@ -265,9 +475,9 @@
     }
    },
    "DependsOn": [
-    "myserverlessapplocalcourseGET3E47EAEA",
-    "myserverlessapplocalcourseOPTIONSE1F07355",
-    "myserverlessapplocalcourse3895C80C",
+    "myserverlessapplocalhelloGETA4EE2503",
+    "myserverlessapplocalhelloOPTIONS7C6BC7B6",
+    "myserverlessapplocalhello1E923776",
     "myserverlessapplocalOPTIONS1EDE5C6C",
     "TokenAuthorizercustomauthA7AF5865"
    ],
@@ -279,7 +489,7 @@
    "Type": "AWS::ApiGateway::Stage",
    "Properties": {
     "DeploymentId": {
-     "Ref": "myserverlessapplocalDeploymentAF9F9E132a399e1cfc5a89d3a001e376c24077f2"
+     "Ref": "myserverlessapplocalDeploymentAF9F9E138dd9d49078048a4890442931246b0ba1"
     },
     "RestApiId": {
      "Ref": "myserverlessapplocal75227048"
@@ -336,7 +546,7 @@
     "aws:cdk:path": "test-cdk-serverless-local/my-serverless-app-local/Default/OPTIONS/Resource"
    }
   },
-  "myserverlessapplocalcourse3895C80C": {
+  "myserverlessapplocalhello1E923776": {
    "Type": "AWS::ApiGateway::Resource",
    "Properties": {
     "ParentId": {
@@ -345,16 +555,16 @@
       "RootResourceId"
      ]
     },
-    "PathPart": "course",
+    "PathPart": "hello",
     "RestApiId": {
      "Ref": "myserverlessapplocal75227048"
     }
    },
    "Metadata": {
-    "aws:cdk:path": "test-cdk-serverless-local/my-serverless-app-local/Default/course/Resource"
+    "aws:cdk:path": "test-cdk-serverless-local/my-serverless-app-local/Default/hello/Resource"
    }
   },
-  "myserverlessapplocalcourseOPTIONSE1F07355": {
+  "myserverlessapplocalhelloOPTIONS7C6BC7B6": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "ApiKeyRequired": false,
@@ -387,23 +597,23 @@
      }
     ],
     "ResourceId": {
-     "Ref": "myserverlessapplocalcourse3895C80C"
+     "Ref": "myserverlessapplocalhello1E923776"
     },
     "RestApiId": {
      "Ref": "myserverlessapplocal75227048"
     }
    },
    "Metadata": {
-    "aws:cdk:path": "test-cdk-serverless-local/my-serverless-app-local/Default/course/OPTIONS/Resource"
+    "aws:cdk:path": "test-cdk-serverless-local/my-serverless-app-local/Default/hello/OPTIONS/Resource"
    }
   },
-  "myserverlessapplocalcourseGETApiPermissiontestcdkserverlesslocalmyserverlessapplocal5BE23D3DGETcourseE4690E73": {
+  "myserverlessapplocalhelloGETApiPermissiontestcdkserverlesslocalmyserverlessapplocal5BE23D3DGEThelloAC902B51": {
    "Type": "AWS::Lambda::Permission",
    "Properties": {
     "Action": "lambda:InvokeFunction",
     "FunctionName": {
      "Fn::GetAtt": [
-      "courselocal47E348A5",
+      "hellolocal4BEF6333",
       "Arn"
      ]
     },
@@ -432,22 +642,22 @@
        {
         "Ref": "myserverlessapplocalDeploymentStagelocalBD3EBF93"
        },
-       "/GET/course"
+       "/GET/hello"
       ]
      ]
     }
    },
    "Metadata": {
-    "aws:cdk:path": "test-cdk-serverless-local/my-serverless-app-local/Default/course/GET/ApiPermission.testcdkserverlesslocalmyserverlessapplocal5BE23D3D.GET..course"
+    "aws:cdk:path": "test-cdk-serverless-local/my-serverless-app-local/Default/hello/GET/ApiPermission.testcdkserverlesslocalmyserverlessapplocal5BE23D3D.GET..hello"
    }
   },
-  "myserverlessapplocalcourseGETApiPermissionTesttestcdkserverlesslocalmyserverlessapplocal5BE23D3DGETcourse9235FEF6": {
+  "myserverlessapplocalhelloGETApiPermissionTesttestcdkserverlesslocalmyserverlessapplocal5BE23D3DGEThello25985699": {
    "Type": "AWS::Lambda::Permission",
    "Properties": {
     "Action": "lambda:InvokeFunction",
     "FunctionName": {
      "Fn::GetAtt": [
-      "courselocal47E348A5",
+      "hellolocal4BEF6333",
       "Arn"
      ]
     },
@@ -472,16 +682,16 @@
        {
         "Ref": "myserverlessapplocal75227048"
        },
-       "/test-invoke-stage/GET/course"
+       "/test-invoke-stage/GET/hello"
       ]
      ]
     }
    },
    "Metadata": {
-    "aws:cdk:path": "test-cdk-serverless-local/my-serverless-app-local/Default/course/GET/ApiPermission.Test.testcdkserverlesslocalmyserverlessapplocal5BE23D3D.GET..course"
+    "aws:cdk:path": "test-cdk-serverless-local/my-serverless-app-local/Default/hello/GET/ApiPermission.Test.testcdkserverlesslocalmyserverlessapplocal5BE23D3D.GET..hello"
    }
   },
-  "myserverlessapplocalcourseGET3E47EAEA": {
+  "myserverlessapplocalhelloGETA4EE2503": {
    "Type": "AWS::ApiGateway::Method",
    "Properties": {
     "AuthorizationType": "CUSTOM",
@@ -507,7 +717,7 @@
         ":lambda:path/2015-03-31/functions/",
         {
          "Fn::GetAtt": [
-          "courselocal47E348A5",
+          "hellolocal4BEF6333",
           "Arn"
          ]
         },
@@ -517,20 +727,341 @@
      }
     },
     "ResourceId": {
-     "Ref": "myserverlessapplocalcourse3895C80C"
+     "Ref": "myserverlessapplocalhello1E923776"
     },
     "RestApiId": {
      "Ref": "myserverlessapplocal75227048"
     }
    },
    "Metadata": {
-    "aws:cdk:path": "test-cdk-serverless-local/my-serverless-app-local/Default/course/GET/Resource"
+    "aws:cdk:path": "test-cdk-serverless-local/my-serverless-app-local/Default/hello/GET/Resource"
+   }
+  },
+  "mywebsocketapilocal2071B21B": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "Name": "my-websocket-api-local",
+    "ProtocolType": "WEBSOCKET",
+    "RouteSelectionExpression": "$request.body.action"
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/my-websocket-api-local/Resource"
+   }
+  },
+  "mywebsocketapilocalconnectRouteconnectlocalPermission937137C7": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "connectlocal190D4238",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "mywebsocketapilocal2071B21B"
+       },
+       "/*$connect"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/my-websocket-api-local/$connect-Route/connect-local-Permission"
+   }
+  },
+  "mywebsocketapilocalconnectRouteconnectlocal7F1C2859": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "mywebsocketapilocal2071B21B"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":apigateway:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "connectlocal190D4238",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/my-websocket-api-local/$connect-Route/connect-local/Resource"
+   }
+  },
+  "mywebsocketapilocalconnectRoute77B7F6F7": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "mywebsocketapilocal2071B21B"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$connect",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "mywebsocketapilocalconnectRouteconnectlocal7F1C2859"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/my-websocket-api-local/$connect-Route/Resource"
+   }
+  },
+  "mywebsocketapilocaldisconnectRoutedisconnectlocalPermissionFADEE1ED": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "disconnectlocal73EF9116",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "mywebsocketapilocal2071B21B"
+       },
+       "/*$disconnect"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/my-websocket-api-local/$disconnect-Route/disconnect-local-Permission"
+   }
+  },
+  "mywebsocketapilocaldisconnectRoutedisconnectlocalD116085D": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "mywebsocketapilocal2071B21B"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":apigateway:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "disconnectlocal73EF9116",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/my-websocket-api-local/$disconnect-Route/disconnect-local/Resource"
+   }
+  },
+  "mywebsocketapilocaldisconnectRouteF1C8BE4C": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "mywebsocketapilocal2071B21B"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$disconnect",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "mywebsocketapilocaldisconnectRoutedisconnectlocalD116085D"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/my-websocket-api-local/$disconnect-Route/Resource"
+   }
+  },
+  "mywebsocketapilocaldefaultRoutedefaultlocalPermission16AB23DC": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "defaultlocalD20E00DC",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "mywebsocketapilocal2071B21B"
+       },
+       "/*$default"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/my-websocket-api-local/$default-Route/default-local-Permission"
+   }
+  },
+  "mywebsocketapilocaldefaultRoutedefaultlocal807CF6C7": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "mywebsocketapilocal2071B21B"
+    },
+    "IntegrationType": "AWS_PROXY",
+    "IntegrationUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":apigateway:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "defaultlocalD20E00DC",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/my-websocket-api-local/$default-Route/default-local/Resource"
+   }
+  },
+  "mywebsocketapilocaldefaultRouteFBEE2CE1": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "mywebsocketapilocal2071B21B"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "$default",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "mywebsocketapilocaldefaultRoutedefaultlocal807CF6C7"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/my-websocket-api-local/$default-Route/Resource"
+   }
+  },
+  "mywebsocketapiselfstageStageA356601C": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "mywebsocketapilocal2071B21B"
+    },
+    "AutoDeploy": true,
+    "StageName": "local"
+   },
+   "Metadata": {
+    "aws:cdk:path": "test-cdk-serverless-local/my-websocket-api-${self.stage}-Stage/Resource"
    }
   },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02QwW6DQAxEvyX3xSWJopxJqt6qVqT3yAGXOMAuwt6gFPHv1W6oymmePdbY8gbW+z2kKxwkKco6afgC40mxqA0Och4bbC8lwvjmbaHsrDl+2yV/Ut+yCDs7GcYWxtw1FIygk5HtGUVIBbIgRrZw8EVNekAhgx1XqDTgA8YvV5PNvF5dzz/Uh4hFlZNo1nEMnvGVusY9WrIauovqpFjFE56QkzjfFxQ3vpNeXRnMmf7cOTnyNP2349khiG0VZj68dl6X04GPzpas8QnWlQQ3eblvUljvIF3dhDnpvVVuCfKn/gLaegtWdgEAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/12QUW+CUAyFf4vv2KFm8RldTPawbMElezQFOqzAvYT2Shzhvy8XcTKfzjlt037pEhbrNYQzbGWeZsW85AS6vWJaBNjKoSuxSjKEbudMqmxNsP02U/9BTcUibE0fMFbQxbYk3/DaB7I6oAipQOQlkBVsXFqQblAowJpzVGrxAt2nLchETo+24R9q/IpJikk0qnlYPNoXqkt7qcior07SXjEfEK4mJrGuSWm4+EZ6tJlvju7WHTcPvp+AnZfQfVGytx56JPDyV4utU7rHV6OUN3h7z0N8GP5P2vd3muFbvsom9wPvTmunU0jvt9ZkrMPvjc0ITvJ0XoaweIZwdhLmeeOMckUQX/UX35V1uu0BAAA="
    },
    "Metadata": {
     "aws:cdk:path": "test-cdk-serverless-local/CDKMetadata/Default"
