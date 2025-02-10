@@ -11,6 +11,8 @@ import * as agwa from "aws-cdk-lib/aws-apigatewayv2-authorizers";
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets';
 
 // Type definitions moved to top for better visibility
 type AuthorizerInfo = {
@@ -54,6 +56,7 @@ type AppConfig = {
     memory?: number;
     concurrency?: number;
     timeout?: number;
+    layers?: string[];
     triggers: Array<{
       type: string;
       endpoint: string;
@@ -63,6 +66,7 @@ type AppConfig = {
       authorizer?: string;
       bucketName?: string;
       bucketEvents?: Array<Record<string, string>>;
+      scheduleExpression?: string;
     }>;
     environmentVariable: Record<string, string>;
   }>;
@@ -79,6 +83,7 @@ export class CdkStack extends cdk.Stack {
     this.createAuthorizers(config);
     this.createApiGateways(config);
     this.createWebSocketApis(config);
+    this.configureSchedulerTriggers(config);
     // this.configureS3Events(config)
 
     console.log("Deployment completed successfully");
@@ -97,7 +102,20 @@ export class CdkStack extends cdk.Stack {
       code: lambda.Code.fromAsset(this.getLambdaAssetPath(fnConfig)),
       handler: fnConfig.handler,
       environment: this.createLambdaEnvironment(config, fnConfig),
+      layers: this.createLayers(config, fnConfig)
     });
+  }
+
+  private createLayers(config: AppConfig, fnConfig: AppConfig['functions'][0]): lambda.ILayerVersion[] | undefined{
+    const layers = fnConfig.layers?.map((layerArn, index) => {
+      const interpolatedArn = interpolateConfig(config, layerArn);
+      return lambda.LayerVersion.fromLayerVersionArn(
+        this,
+        `${fnConfig.name}Layer${index}`, // Unique ID for each layer
+        interpolatedArn
+      );
+    });
+    return layers;
   }
 
   private getLambdaAssetPath(fnConfig: AppConfig['functions'][0]): string {
@@ -318,5 +336,29 @@ export class CdkStack extends cdk.Stack {
       principal: new iam.ServicePrincipal('s3.amazonaws.com'),
       sourceArn: bucket.bucketArn
     });
+  }
+
+  private configureSchedulerTriggers(config: AppConfig): void {
+    config.functions.forEach(fnConfig => {
+      fnConfig.triggers
+        .filter(trigger => trigger.type === 'scheduler')
+        .forEach(trigger => {
+          this.createSchedulerTrigger(config, fnConfig.name, trigger);
+        });
+    });
+  }
+
+  private createSchedulerTrigger(config: AppConfig, functionName: string, trigger: any): void {
+    const lambdaFunction = this.functionMap[functionName];
+    if (!trigger.scheduleExpression) {
+      throw new Error(`Schedule expression is required for scheduler trigger in function ${functionName}`);
+    }
+    const interpolatedSchedule = interpolateConfig(config, trigger.scheduleExpression);
+    
+    const rule = new events.Rule(this, `SchedulerRule-${functionName}-${interpolatedSchedule}`, {
+      schedule: events.Schedule.expression(interpolatedSchedule),
+    });
+    
+    rule.addTarget(new targets.LambdaFunction(lambdaFunction));
   }
 }
